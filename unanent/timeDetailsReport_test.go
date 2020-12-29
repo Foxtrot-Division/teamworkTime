@@ -19,10 +19,13 @@ func initTimeDetailsReport(t *testing.T) *Report {
 
 	r, err := NewReport(conn)
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Fatalf(err.Error())
 	}
 
-	r.LoadConfig("./testdata/timeDetails.json")
+	err = r.LoadConfig("./testdata/timeDetailsConf.json")
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
 
 	return r
 }

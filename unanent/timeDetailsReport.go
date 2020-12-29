@@ -66,8 +66,9 @@ func (r *Report) ParseTimeDetailsReport(path string) ([]*teamworkapi.TimeEntry, 
 		entry := new(teamworkapi.TimeEntry)
 		entry.PersonID = users[line[m["Person"]]].ID
 		entry.Date = date
-		entry.Description = "Imported from Unanet report."
+		entry.Description = "Imported from Unanet Time Details report."
 		entry.Hours = line[m["Hours"]]
+		entry.Minutes = "0"
 		entry.ProjectID = r.ProjectMappings[line[m["ProjectCode"]]]
 		entry.TaskID = r.TaskMappings[line[m["TaskNumber"]]]
 
@@ -92,7 +93,7 @@ func (r *Report) UploadTimeEntries(entries []*teamworkapi.TimeEntry) (error) {
 			continue
 		}
 
-		log.Info("created time entry ID (%s)", id)
+		log.Infof("created time entry ID (%s)", id)
 	}
 
 	if errorBuffer != "" {
