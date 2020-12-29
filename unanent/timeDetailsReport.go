@@ -6,6 +6,7 @@ import (
 	"os"
 
 	teamworkapi "github.com/Foxtrot-Division/teamworkAPI"
+	log "github.com/sirupsen/logrus"
 )
 
 // ParseTimeDetailsReport converts Unanet time report into an array of TimeEntry objects.
@@ -72,7 +73,6 @@ func (r *Report) ParseTimeDetailsReport(path string) ([]*teamworkapi.TimeEntry, 
 
 		entries[i] = entry
 	}
-
 	return entries, nil
 }
 
@@ -91,8 +91,8 @@ func (r *Report) UploadTimeEntries(entries []*teamworkapi.TimeEntry) (error) {
 			errorBuffer += err.Error()
 			continue
 		}
-	
-		fmt.Printf("created time entry ID (%s)", id)
+
+		log.Info("created time entry ID (%s)", id)
 	}
 
 	if errorBuffer != "" {
