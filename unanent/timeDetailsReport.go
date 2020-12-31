@@ -127,6 +127,7 @@ func (r *TimeDetailsReport) ParseTimeDetailsReport(path string) ([]*teamworkapi.
 		entry.Minutes = "0"
 		entry.ProjectID = r.Report.ProjectMappings[line[m["ProjectCode"]]]
 		entry.TaskID = r.Report.TaskMappings[line[m["TaskNumber"]]]
+		entry.IsBillable = "true"
 
 		entries[i] = entry
 	}
