@@ -1,7 +1,6 @@
 package unanet
 
 import (
-	"fmt"
 	"strconv"
 	"testing"
 
@@ -68,8 +67,6 @@ func TestParseTimeDetailsReport(t *testing.T) {
 	if sumHours < 1.0 {
 		t.Errorf("expected total hours to be at least 1.0 but got (%f)", sumHours)
 	}
-
-	fmt.Println(r.Report.Filename)
 }
 
 func TestUploadTimeEntries(t *testing.T) {
