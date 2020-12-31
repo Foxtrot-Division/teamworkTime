@@ -11,7 +11,7 @@ import (
 )
 
 // UnanetTimeShort represents a Unanet date in short form.
-const UnanetTimeShort = "1/02/2006"
+const UnanetTimeShort = "1/2/2006"
 
 // TeamworkTimeShort represents a Teamwork date in short form.
 const TeamworkTimeShort = "20060102"
