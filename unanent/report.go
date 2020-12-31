@@ -20,6 +20,7 @@ const TeamworkTimeShort = "20060102"
 // in the .csv file.  FieldIndex maps each field to its respective column number
 // in the .csv file.
 type Report struct {
+	Filename        string 		
 	Name            string   			`json:"reportName"`
 	Fields          []string 			`json:"columns"`
 	FieldIndex      map[string]int
@@ -114,7 +115,6 @@ func (r *Report) VerifyColumns(columns []string) error {
 // short format (YYYYMMDD).
 func ConvertUnanetDate(d string) (string, error) {
 	uTime, err := time.Parse(UnanetTimeShort, d)
-
 	if err != nil {
 		return "", err
 	}

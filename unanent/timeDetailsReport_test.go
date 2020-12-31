@@ -1,33 +1,31 @@
 package unanet
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"os"
+	"fmt"
 	"strconv"
 	"testing"
 
 	teamworkapi "github.com/Foxtrot-Division/teamworkAPI"
 )
 
-func initTimeDetailsReport(t *testing.T) *Report {
+func initTimeDetailsReport(t *testing.T) *TimeDetailsReport {
 
 	conn, err := teamworkapi.NewConnectionFromJSON("./testdata/apiConfig.json")
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 
-	r, err := NewReport(conn)
+	tr, err := NewTimeDetailsReport(conn)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 
-	err = r.LoadConfig("./testdata/timeDetailsConf.json")
+	err = tr.Report.LoadConfig("./testdata/timeDetailsConf.json")
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 
-	return r
+	return tr
 }
 
 func TestParseTimeDetailsReport(t *testing.T) {
@@ -40,7 +38,7 @@ func TestParseTimeDetailsReport(t *testing.T) {
 	}
 
 	sumHours := 0.0
-	userEntries := make(map[string] *teamworkapi.Person)
+	userEntries := make(map[string]*teamworkapi.Person)
 
 	for _, v := range entries {
 
@@ -54,11 +52,11 @@ func TestParseTimeDetailsReport(t *testing.T) {
 		if userEntries[v.PersonID] == nil {
 
 			// verify we've mapped the user correctly by retrieving the user details
-			p, err := r.Connection.GetPersonByID(v.PersonID) 
+			p, err := r.Report.Connection.GetPersonByID(v.PersonID)
 			if err != nil {
 				t.Error(err.Error())
 			}
-		
+
 			if p == nil {
 				t.Errorf("call to GetPersonByID(%s) returned nil", v.PersonID)
 			}
@@ -70,31 +68,20 @@ func TestParseTimeDetailsReport(t *testing.T) {
 	if sumHours < 1.0 {
 		t.Errorf("expected total hours to be at least 1.0 but got (%f)", sumHours)
 	}
+
+	fmt.Println(r.Report.Filename)
 }
 
 func TestUploadTimeEntries(t *testing.T) {
 
 	r := initTimeDetailsReport(t)
 
-	f, err := os.Open("./testdata/timeDetailsTestData.json")
-	defer f.Close()
-
+	_, err := r.ParseTimeDetailsReport("./testdata/report.csv")
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
 
-	data := new(teamworkapi.TimeEntriesJSON)
-
-	raw, _ := ioutil.ReadAll(f)
-
-	err = json.Unmarshal(raw, &data)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
-
-	entries := data.TimeEntries
-
-	err = r.UploadTimeEntries(entries)
+	err = r.UploadTimeEntries()
 	if err != nil {
 		t.Errorf(err.Error())
 	}
