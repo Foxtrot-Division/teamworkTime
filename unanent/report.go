@@ -11,7 +11,7 @@ import (
 )
 
 // UnanetTimeShort represents a Unanet date in short form.
-const UnanetTimeShort = "01/02/2006"
+const UnanetTimeShort = "1/02/2006"
 
 // TeamworkTimeShort represents a Teamwork date in short form.
 const TeamworkTimeShort = "20060102"
@@ -20,21 +20,21 @@ const TeamworkTimeShort = "20060102"
 // in the .csv file.  FieldIndex maps each field to its respective column number
 // in the .csv file.
 type Report struct {
-	Filename        string 		
-	Name            string   			`json:"reportName"`
-	Fields          []string 			`json:"columns"`
+	Filename        string
+	Name            string   `json:"reportName"`
+	Fields          []string `json:"columns"`
 	FieldIndex      map[string]int
-	CompanyMappings map[string]string 	`json:"companyMappings"`
-	ProjectMappings map[string]string 	`json:"projectMappings"`
-	TaskMappings    map[string]string 	`json:"taskMappings"`
-	UserMappings    map[string]string 	`json:"userMappings"`
-	Connection		*teamworkapi.Connection
+	CompanyMappings map[string]string `json:"companyMappings"`
+	ProjectMappings map[string]string `json:"projectMappings"`
+	TaskMappings    map[string]string `json:"taskMappings"`
+	UserMappings    map[string]string `json:"userMappings"`
+	Connection      *teamworkapi.Connection
 }
 
 // NewReport creates a new Report instance and initializes the Connection to
 // Teamwork API.
 func NewReport(conn *teamworkapi.Connection) (*Report, error) {
-	
+
 	if conn == nil {
 		return nil, fmt.Errorf("parameter (*teamworkapi.Connection) is nil")
 	}
@@ -47,7 +47,7 @@ func NewReport(conn *teamworkapi.Connection) (*Report, error) {
 }
 
 // LoadConfig configures a Report based on json file.
-func (r *Report) LoadConfig(pathToFile string) (error) {
+func (r *Report) LoadConfig(pathToFile string) error {
 
 	f, err := os.Open(pathToFile)
 	if err != nil {
@@ -99,7 +99,7 @@ func (r *Report) VerifyColumns(columns []string) error {
 			if errBuff != "" {
 				errBuff += ", "
 			}
-			
+
 			errBuff += v1
 		}
 	}
