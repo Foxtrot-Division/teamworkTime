@@ -31,7 +31,7 @@ func TestParseTimeDetailsReport(t *testing.T) {
 
 	r := initTimeDetailsReport(t)
 
-	entries, err := r.ParseTimeDetailsReport("./testdata/report.csv")
+	entries, err := r.ParseTimeDetailsReport("./testdata/report2.csv")
 	if err != nil {
 		t.Errorf(err.Error())
 	}

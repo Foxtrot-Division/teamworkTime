@@ -78,7 +78,7 @@ func (r *TimeDetailsReport) ParseTimeDetailsReport(path string) ([]*teamworkapi.
 
 		// if we have not seen this person yet, initialize a new Person object
 		if _, ok := users[line[m["Person"]]]; !ok {
-
+			fmt.Printf("Looking up user %s\n", r.Report.UserMappings[line[m["Person"]]])
 			// verify person is found in Teamwork
 			p, err := r.Report.Connection.GetPersonByID(r.Report.UserMappings[line[m["Person"]]])
 			if err != nil {
