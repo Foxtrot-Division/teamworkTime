@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
 	"time"
 
 	teamworkapi "github.com/Foxtrot-Division/teamworkAPI"
@@ -150,6 +151,11 @@ func (r *TimeDetailsReport) ParseTimeDetailsReport(path string) ([]*teamworkapi.
 // convention, time-details-report_YYYYMMDD-YYYYMMDD.csv.
 func (r *TimeDetailsReport) UploadTimeEntries() error {
 
+	err := r.ScrubTimeEntries()
+	if err != nil {
+		return err
+	}
+
 	errorBuffer := ""
 
 	originalFile := r.Report.Filename
@@ -244,6 +250,81 @@ func (r *TimeDetailsReport) UploadTimeEntries() error {
 	if errorBuffer != "" {
 		return fmt.Errorf("one or more errors occurred: %s", errorBuffer)
 	}
+
+	return nil
+}
+
+// ScrubTimeEntries will remove duplicate entries from the TimeDetailsReport.
+// This is used prior to uploading entires to Teamwork.
+func (r *TimeDetailsReport) ScrubTimeEntries() error {
+
+	lookup := make(map[string] []*teamworkapi.TimeEntry)
+	scrubbed := make([]*teamworkapi.TimeEntry, 0)
+	add := true
+	for _, entry := range(r.Entries) {
+
+		if _, ok := lookup[entry.TaskID]; !ok {
+			existing, err := r.Report.Connection.GetTimeEntriesByTask(entry.TaskID)
+			if err !=nil {
+				return err
+			}
+
+			lookup[entry.TaskID] = existing
+			//fmt.Printf("added task ID %s to lookup with %d entries\n", entry.TaskID, len(lookup[entry.TaskID]))
+		}
+		//fmt.Printf("checking for match for entry %s %s hours: %s mins: %s\n", entry.Date, entry.PersonID, entry.Hours, entry.Minutes)
+
+		add = true
+		for _, existingEntry := range(lookup[entry.TaskID]) {
+			existingEntryDate, err := time.Parse(time.RFC3339, existingEntry.Date)
+			if err != nil {
+				return err
+			}
+
+			hours, err := strconv.ParseFloat(existingEntry.Hours, 64)
+			if err != nil {
+				return err
+			}
+
+			minutes, err := strconv.ParseFloat(existingEntry.Minutes, 64)
+			if err != nil {
+				return err
+			}
+					
+			normalizedHours := hours + (minutes / 60.0)
+			normalizedCurrentHours, err := strconv.ParseFloat(entry.Hours, 64)
+			if err != nil {
+				return err
+			}
+
+			//fmt.Printf("normalized %s:%s to %s hours\n", existingEntry.Hours, existingEntry.Minutes, normalizedHours)
+			
+			if existingEntryDate.Format(TeamworkTimeShort) == entry.Date && existingEntry.PersonID == entry.PersonID {
+				
+				// if Unanet hours do not match the existing Teamwork hours,
+				// delete the Teamwork entry (will be replaced with Unanet entry)
+				if normalizedHours != normalizedCurrentHours {
+					//fmt.Printf("hours do not match, deleting entry\n")
+					err := r.Report.Connection.DeleteTimeEntry(entry.ID)
+					if err != nil {
+						return err
+					}
+				} else {
+					add = false
+				}
+			}
+			if !add {
+				break
+			}
+		}
+
+		if add {
+			//fmt.Printf("no match for %s %s %s %s\n", entry.Date, entry.PersonID, entry.Hours, entry.Minutes)
+			scrubbed = append(scrubbed, entry)
+		}
+	}
+
+	r.Entries = scrubbed
 
 	return nil
 }

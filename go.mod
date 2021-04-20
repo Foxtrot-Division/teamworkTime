@@ -3,7 +3,7 @@ module github.com/Foxtrot-Division/teamworkTime
 go 1.15
 
 require (
-	github.com/Foxtrot-Division/teamworkAPI v0.0.0-20201228194558-dfe325b4acec
+	github.com/Foxtrot-Division/teamworkAPI v0.0.0-20210413174807-a9a6b51ab769
 	github.com/kr/text v0.2.0 // indirect
 	github.com/stretchr/testify v1.6.1 // indirect
 	golang.org/x/sys v0.0.0-20201223074533-0d417f636930 // indirect

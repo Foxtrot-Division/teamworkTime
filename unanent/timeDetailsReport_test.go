@@ -32,7 +32,7 @@ func TestParseTimeDetailsReport(t *testing.T) {
 
 	r := initTimeDetailsReport(t)
 
-	entries, err := r.ParseTimeDetailsReport("./testdata/report2.csv")
+	entries, err := r.ParseTimeDetailsReport("./testdata/report3.csv")
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -41,7 +41,7 @@ func TestParseTimeDetailsReport(t *testing.T) {
 	userEntries := make(map[string]*teamworkapi.Person)
 
 	for _, v := range entries {
-
+		fmt.Printf("entry for %s on %s\n", v.PersonID, v.Date)
 		h, err := strconv.ParseFloat(v.Hours, 64)
 		if err != nil {
 			t.Error(err.Error())
@@ -70,11 +70,30 @@ func TestParseTimeDetailsReport(t *testing.T) {
 	}
 }
 
+func TestScrubTimeEntries(t *testing.T) {
+	r := initTimeDetailsReport(t)
+
+	_, err := r.ParseTimeDetailsReport("./testdata/report3.csv")
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	fmt.Printf("Original Length: %d\n", len(r.Entries))
+
+	err = r.ScrubTimeEntries()
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+
+	fmt.Printf("Post-scrub length: %d\n", len(r.Entries))
+}
+
 func TestUploadTimeEntries(t *testing.T) {
 
 	r := initTimeDetailsReport(t)
 
-	_, err := r.ParseTimeDetailsReport("./testdata/report.csv")
+	_, err := r.ParseTimeDetailsReport("./testdata/report3.csv")
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
